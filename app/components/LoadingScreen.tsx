@@ -86,7 +86,7 @@ export default function LoadingScreen() {
                                 transition={{ duration: 0.5 }}
                             >
                                 <Image
-                                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/phalcon/phalcon-plain.svg"
+                                    src="/logo.png"
                                     alt="Loading icon"
                                     width={192}
                                     height={192}
@@ -102,7 +102,7 @@ export default function LoadingScreen() {
                                 transition={{ duration: 0.5, delay: 0.2 }}
                                 style={{ color: isDark ? '#141015' : 'white' }}
                             >
-                                Luxera
+                                StreeSilk
                             </motion.h1>
 
                             {/* Progress bar */}

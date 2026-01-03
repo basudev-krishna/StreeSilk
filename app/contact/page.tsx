@@ -2,12 +2,32 @@
 
 import { useState, FormEvent } from "react";
 import Image from "next/image";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { useAuth as useClerkAuth } from "@clerk/nextjs";
+import Link from "next/link";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { Instagram, Facebook, MessageCircle } from "lucide-react";
 
+import { useAuth } from "../context/AuthContext";
+import { useAuth as useClerkAuth } from "@clerk/nextjs";
+import { submitContactMessage } from "../actions/contact";
+
+// --- Constants ---
+const GUWAHATI_ADDRESS = "Ganeshguri, Guwahati, Assam, India - 781006"; // Specific Demo Address
+const CONTACT_INFO = {
+    email1: "support@streesilk.com",
+    email2: "sales@streesilk.com",
+    phone: "+91 98765 43210",
+    address: GUWAHATI_ADDRESS,
+    // NOTE: This URL should be replaced with the actual Google Maps iframe source for Guwahati for it to function correctly.
+    mapEmbedUrl: `https://www.google.com/maps/search/streesilk/@26.1750589,91.7460188,16z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI1MTEyMy4xIKXMDSoASAFQAw%3D%3D`
+};
+
+const SOCIAL_LINKS = {
+    instagram: "https://www.instagram.com/streesilk",
+    facebook: "https://www.facebook.com/streesilkofficial",
+    whatsapp: "https://wa.me/919876543210"
+};
+
+// --- Main Component ---
 export default function ContactPage() {
     const { requireAuth } = useAuth();
     const { userId } = useClerkAuth();
@@ -21,8 +41,9 @@ export default function ContactPage() {
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-
-    const submitContactMessage = useMutation(api.contact.submitContactMessage);
+    const submitContactMessageAction = async (data: any) => {
+        return await submitContactMessage(data);
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -36,6 +57,8 @@ export default function ContactPage() {
         e.preventDefault();
         setSubmitError(null);
 
+        // Optional: Keep authentication check if desired, or remove if contact form should be public
+        // For now, keeping the auth requirement as per original code
         const isAuthorized = await requireAuth("You need to sign in to send us a message.");
 
         if (isAuthorized) {
@@ -70,167 +93,206 @@ export default function ContactPage() {
         }
     };
 
+    // --- Components for Bento Layout ---
+
+    // 1. Map/Location Bento Item
+    const MapBentoItem = () => (
+        <div className="bg-card rounded-xl p-4 sm:p-6 border border-border/70 shadow-lg h-full flex flex-col overflow-hidden md:col-span-3">
+            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2 text-primary">
+                <MapPin size={20} /> Our Location in Guwahati
+            </h3>
+            {/* The responsive iframe container */}
+            <div className="relative w-full overflow-hidden flex-grow" style={{ paddingBottom: '30%' }}>
+                <iframe
+                    src={CONTACT_INFO.mapEmbedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, position: 'absolute', top: 0, left: 0 }}
+                    allowFullScreen={false}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Google Maps Location: Guwahati"
+                ></iframe>
+            </div>
+            <p className="text-muted-foreground mt-3 text-sm">
+                **Address:** {CONTACT_INFO.address}
+            </p>
+        </div>
+    );
+
+    // 2. Contact Details Bento Item (FIXED: Address restored here)
+    const DetailsBentoItem = () => (
+        <div className="bg-card rounded-xl p-6 border border-border/70 shadow-lg h-full space-y-6 md:col-span-1">
+            <h3 className="text-xl font-semibold mb-4 border-b border-border pb-2">Direct Contact</h3>
+
+            {/* Email */}
+            <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0 mt-1">
+                    <Mail size={20} />
+                </div>
+                <div>
+                    <h4 className="font-medium text-foreground">Customer Support</h4>
+                    <p className="text-muted-foreground text-sm">{CONTACT_INFO.email1}</p>
+                    <p className="text-muted-foreground text-sm">General inquiries</p>
+                </div>
+            </div>
+
+            {/* Phone */}
+            <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0 mt-1">
+                    <Phone size={20} />
+                </div>
+                <div>
+                    <h4 className="font-medium text-foreground">Sales & Inquiries</h4>
+                    <p className="text-muted-foreground text-sm">{CONTACT_INFO.phone}</p>
+                    <p className="text-muted-foreground text-sm">Mon-Fri: 9am - 5pm IST</p>
+                </div>
+            </div>
+
+            {/* Address - RESTORED */}
+            <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0 mt-1">
+                    <MapPin size={20} />
+                </div>
+                <div>
+                    <h4 className="font-medium text-foreground">Corporate Address</h4>
+                    <p className="text-muted-foreground text-sm">{CONTACT_INFO.address}</p>
+                </div>
+            </div>
+
+            {/* Social Media Buttons */}
+            <div className="pt-4 border-t border-border">
+                <h4 className="font-medium text-foreground mb-3">Connect With Us</h4>
+                <div className="flex gap-4">
+                    {/* Instagram */}
+                    <Link href={SOCIAL_LINKS.instagram} target="_blank" aria-label="Instagram" className="p-3 rounded-full bg-pink-600/10 text-pink-600 hover:bg-pink-600/20 transition-colors">
+                        <Instagram size={20} />
+                    </Link>
+
+                    {/* Facebook */}
+                    <Link href={SOCIAL_LINKS.facebook} target="_blank" aria-label="Facebook" className="p-3 rounded-full bg-blue-600/10 text-blue-600 hover:bg-blue-600/20 transition-colors">
+                        <Facebook size={20} />
+                    </Link>
+
+                    {/* WhatsApp */}
+                    <Link href={SOCIAL_LINKS.whatsapp} target="_blank" aria-label="WhatsApp" className="p-3 rounded-full bg-green-600/10 text-green-600 hover:bg-green-600/20 transition-colors">
+                        <MessageCircle size={20} />
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+
+    // 3. Contact Form Bento Item
+    const FormBentoItem = () => (
+        <div className="md:col-span-2 bg-card rounded-xl p-6 sm:p-8 border border-border/70 shadow-lg">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6">Send Us a Message</h2>
+
+            {submitSuccess && (
+                <div className="bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 mb-6">
+                    <p className="text-green-800 dark:text-green-300 font-medium">Thank you for your message! We'll get back to you soon.</p>
+                </div>
+            )}
+
+            {submitError && (
+                <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
+                    <p className="text-red-800 dark:text-red-300 font-medium">{submitError}</p>
+                </div>
+            )}
+
+            <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                        <label htmlFor="name" className="block text-sm font-medium mb-1">Your Name</label>
+                        <input
+                            type="text" id="name" value={formData.name} onChange={handleChange} required
+                            className="w-full px-4 py-2 sm:py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
+                        <input
+                            type="email" id="email" value={formData.email} onChange={handleChange} required
+                            className="w-full px-4 py-2 sm:py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label htmlFor="subject" className="block text-sm font-medium mb-1">Subject</label>
+                    <input
+                        type="text" id="subject" value={formData.subject} onChange={handleChange}
+                        className="w-full px-4 py-2 sm:py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="message" className="block text-sm font-medium mb-1">Message</label>
+                    <textarea
+                        id="message" rows={5} value={formData.message} onChange={handleChange} required
+                        className="w-full px-4 py-2 sm:py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-base"
+                    ></textarea>
+                </div>
+
+                <button
+                    type="submit" disabled={isSubmitting}
+                    className={`flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors text-base shadow-md ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                        }`}
+                >
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 size={18} className="animate-spin" />
+                            Sending...
+                        </>
+                    ) : (
+                        <>
+                            <Send size={18} />
+                            Send Message
+                        </>
+                    )}
+                </button>
+            </form>
+        </div>
+    );
+
+    // --- Main Render ---
+
     return (
         <>
             {/* Hero section */}
-            <div className="relative h-60 sm:h-64 md:h-80 lg:h-96 bg-muted overflow-hidden">
+            <div className="relative h-60 sm:h-72 md:h-80 bg-muted overflow-hidden">
                 <Image
                     src="https://images.unsplash.com/photo-1534536281715-e28d76689b4d?q=80&w=2070&auto=format&fit=crop"
                     alt="Contact us"
                     fill
                     priority
                     sizes="100vw"
-                    className="object-cover object-center brightness-75"
+                    className="object-cover object-center brightness-[0.7] dark:brightness-[0.4]"
                 />
                 <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-6">
                     <div className="text-center max-w-3xl mx-auto">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 sm:mb-4 drop-shadow-md">
-                            Contact Us
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-2 sm:mb-3 tracking-tight drop-shadow-lg">
+                            Get In Touch
                         </h1>
-                        <p className="text-white/90 text-sm sm:text-base md:text-lg max-w-xl mx-auto drop-shadow">
-                            We&apos;re here to help with any questions about our products
+                        <p className="text-white/90 text-sm sm:text-base md:text-lg max-w-xl mx-auto drop-shadow-md">
+                            We're here to help! Reach out to us for support, sales, or partnership inquiries.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-                    {/* Contact Info Cards */}
-                    <div className="space-y-4 sm:space-y-6 order-2 md:order-1">
-                        <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm hover:shadow-md transition-shadow flex items-start space-x-4">
-                            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
-                                <Mail size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-medium text-foreground mb-1">Email Us</h3>
-                                <p className="text-muted-foreground text-sm sm:text-base">bidhandhakal365@gmail.com</p>
-                                <p className="text-muted-foreground text-sm sm:text-base">support@pyuto.com</p>
-                            </div>
-                        </div>
+            {/* Bento Grid Layout Section */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-24">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 auto-rows-fr">
 
-                        <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm hover:shadow-md transition-shadow flex items-start space-x-4">
-                            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
-                                <Phone size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-medium text-foreground mb-1">Call Us</h3>
-                                <p className="text-muted-foreground text-sm sm:text-base">(+977)9768316936</p>
-                                <p className="text-muted-foreground text-sm sm:text-base">Mon-Fri: 11am - 6pm</p>
-                            </div>
-                        </div>
+                    {/* Row 1: Form (2/3) and Details (1/3) */}
+                    <FormBentoItem />
+                    <DetailsBentoItem />
 
-                        <div className="bg-card rounded-lg p-4 sm:p-6 border border-border shadow-sm hover:shadow-md transition-shadow flex items-start space-x-4">
-                            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
-                                <MapPin size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-medium text-foreground mb-1">Visit Us</h3>
-                                <p className="text-muted-foreground text-sm sm:text-base">Tulsipur-7, Dang</p>
-                                <p className="text-muted-foreground text-sm sm:text-base">Nepal</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Contact Form */}
-                    <div className="md:col-span-2 lg:col-span-2 order-1 md:order-2">
-                        <div className="bg-card rounded-lg p-5 sm:p-6 md:p-8 border border-border shadow-sm">
-                            <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Get in Touch</h2>
-
-                            {submitSuccess ? (
-                                <div className="bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 mb-6">
-                                    <p className="text-green-800 dark:text-green-300 font-medium">Thank you for your message! We&apos;ll get back to you soon.</p>
-                                </div>
-                            ) : null}
-
-                            {submitError ? (
-                                <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
-                                    <p className="text-red-800 dark:text-red-300 font-medium">{submitError}</p>
-                                </div>
-                            ) : null}
-
-                            <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                    <div>
-                                        <label htmlFor="name" className="block text-sm font-medium mb-1 sm:mb-2">
-                                            Your Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm sm:text-base"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="email" className="block text-sm font-medium mb-1 sm:mb-2">
-                                            Email Address
-                                        </label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm sm:text-base"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="subject" className="block text-sm font-medium mb-1 sm:mb-2">
-                                        Subject
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="subject"
-                                        value={formData.subject}
-                                        onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm sm:text-base"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="message" className="block text-sm font-medium mb-1 sm:mb-2">
-                                        Message
-                                    </label>
-                                    <textarea
-                                        id="message"
-                                        rows={4}
-                                        value={formData.message}
-                                        onChange={handleChange}
-                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-sm sm:text-base"
-                                        required
-                                    ></textarea>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className={`flex items-center justify-center gap-2 w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors text-sm sm:text-base ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                                        }`}
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            Sending...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Send size={16} className="hidden sm:block" />
-                                            <Send size={14} className="sm:hidden" />
-                                            Send Message
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    {/* Row 2: Map (3/3) */}
+                    <MapBentoItem />
                 </div>
             </div>
         </>
     );
-} 
+}

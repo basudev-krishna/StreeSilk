@@ -2,24 +2,39 @@
 
 import { useState, useEffect } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
-import { api } from "../../../../convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
 import { redirect } from "next/navigation";
 import { Button } from "../../../components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { createProduct } from "../../../actions/products";
+import { uploadImage } from "../../../actions/upload";
+
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS
+    ? process.env.NEXT_PUBLIC_ADMIN_EMAILS.split(",").map(email => email.trim())
+    : [];
 
 export default function NewProductPage() {
     const { user } = useUser();
     const { isLoaded, isSignedIn } = useAuth();
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
-    const clerkId = user?.id;
-    const isAdmin = useQuery(api.users.isUserAdmin, clerkId ? { clerkId } : "skip");
-
-
-    const addProduct = useMutation(api.products.addProduct);
+    useEffect(() => {
+        if (isLoaded) {
+            if (!isSignedIn) {
+                redirect("/");
+            } else {
+                const email = user?.primaryEmailAddress?.emailAddress;
+                const isAdmin = email && ADMIN_EMAILS.includes(email);
+                if (!isAdmin) {
+                    redirect("/");
+                } else {
+                    setLoading(false);
+                }
+            }
+        }
+    }, [isLoaded, isSignedIn, user]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -35,18 +50,6 @@ export default function NewProductPage() {
         isActive: true,
         stock: 0,
     });
-
-    useEffect(() => {
-        if (isLoaded) {
-            if (!isSignedIn) {
-                redirect("/");
-            } else if (isAdmin === false) {
-                redirect("/");
-            } else if (isAdmin !== undefined) {
-                setLoading(false);
-            }
-        }
-    }, [isLoaded, isSignedIn, isAdmin]);
 
     if (loading) {
         return (
@@ -73,7 +76,8 @@ export default function NewProductPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!clerkId) return;
+
+        if (!user?.id) return;
 
         setSubmitting(true);
 
@@ -86,7 +90,7 @@ export default function NewProductPage() {
                 ? formData.colors.split(",").map(c => c.trim()).filter(Boolean)
                 : undefined;
 
-            await addProduct({
+            await createProduct({
                 name: formData.name,
                 description: formData.description || undefined,
                 price: formData.price,
@@ -99,7 +103,7 @@ export default function NewProductPage() {
                 isSale: formData.isSale,
                 isActive: formData.isActive,
                 stock: formData.stock > 0 ? formData.stock : undefined,
-                clerkId: clerkId,
+                clerkId: user.id,
             });
 
             window.location.href = "/admin";
@@ -149,23 +153,61 @@ export default function NewProductPage() {
                                 className="w-full p-3 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
                             >
                                 <option value="">Select a category</option>
-                                <option value="Men's T-Shirts">Men&apos;s T-Shirts</option>
-                                <option value="Women's T-Shirts">Women&apos;s T-Shirts</option>
-                                <option value="Accessories">Accessories</option>
+                                <option value="Silk">Silk&apos;s Saree</option>
+                                <option value="Muga">Muga&apos;s Saree</option>
+                                <option value="Paat">Paat&apos;s Saree</option>
                             </select>
                         </div>
 
-                        {/* Image URL */}
+                        {/* Image Upload */}
                         <div>
-                            <label className="block mb-2 font-medium">Image URL</label>
-                            <input
-                                type="url"
-                                name="image"
-                                value={formData.image}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-3 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            />
+                            <label className="block mb-2 font-medium">Product Image</label>
+
+                            <div className="flex flex-col gap-4">
+                                {formData.image && (
+                                    <div className="relative w-full h-48 sm:h-64 bg-secondary rounded-md overflow-hidden">
+                                        <img
+                                            src={formData.image}
+                                            alt="Preview"
+                                            className="w-full h-full object-contain"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, image: "" }))}
+                                            className="absolute top-2 right-2 bg-destructive text-destructive-foreground p-1 rounded-full hover:bg-destructive/90"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+
+                                            setUploading(true);
+                                            const data = new FormData();
+                                            data.append("file", file);
+
+                                            const result = await uploadImage(data);
+
+                                            if (result.success && result.url) {
+                                                setFormData(prev => ({ ...prev, image: result.url }));
+                                            } else {
+                                                alert("Failed to upload image");
+                                            }
+                                            setUploading(false);
+                                        }}
+                                        className="w-full p-2 border border-border rounded-md bg-background file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                                    />
+                                    {uploading && <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>}
+                                </div>
+                                <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, WEBP</p>
+                            </div>
                         </div>
 
                         {/* Price */}

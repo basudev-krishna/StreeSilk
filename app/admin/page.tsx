@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { api } from "../../convex/_generated/api";
-import { useQuery } from "convex/react";
 import { redirect } from "next/navigation";
 import { Button } from "../components/ui/button";
 import Link from "next/link";
@@ -11,28 +9,49 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { formatPrice } from "../lib/formatters";
 import Image from "next/image";
 
+// Admin emails from environment variable
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS
+    ? process.env.NEXT_PUBLIC_ADMIN_EMAILS.split(",").map(email => email.trim())
+    : [];
+
 export default function AdminDashboard() {
     const { user } = useUser();
     const { isLoaded, isSignedIn } = useAuth();
     const [loading, setLoading] = useState(true);
-
-    const clerkId = user?.id;
-    const isAdmin = useQuery(api.users.isUserAdmin, clerkId ? { clerkId } : "skip");
-
-    const productsResult = useQuery(api.products.listProducts, {});
-    const products = productsResult || [];
+    const [products, setProducts] = useState<any[]>([]);
 
     useEffect(() => {
-        if (isLoaded) {
-            if (!isSignedIn) {
-                redirect("/");
-            } else if (isAdmin === false) {
-                redirect("/");
-            } else if (isAdmin !== undefined) {
-                setLoading(false);
+        const checkAdminAndFetch = async () => {
+            if (isLoaded) {
+                if (!isSignedIn) {
+                    redirect("/");
+                    return;
+                }
+
+                // Check admin status
+                const email = user?.primaryEmailAddress?.emailAddress;
+                const isAdmin = email && ADMIN_EMAILS.includes(email);
+
+                if (!isAdmin) {
+                    redirect("/");
+                    return;
+                }
+
+                // Fetch products
+                try {
+                    const { getProducts } = await import("../actions/products");
+                    const data = await getProducts();
+                    setProducts(data);
+                } catch (error) {
+                    console.error("Failed to fetch products:", error);
+                } finally {
+                    setLoading(false);
+                }
             }
-        }
-    }, [isLoaded, isSignedIn, isAdmin]);
+        };
+
+        checkAdminAndFetch();
+    }, [isLoaded, isSignedIn, user]);
 
     if (loading) {
         return (
@@ -73,7 +92,7 @@ export default function AdminDashboard() {
                         <tbody className="divide-y divide-border">
                             {products.length > 0 ? (
                                 products.map((product) => (
-                                    <tr key={product._id.toString()} className="hover:bg-muted/50">
+                                    <tr key={product.id} className="hover:bg-muted/50">
                                         <td className="px-4 py-3">
                                             <div className="h-12 w-12 rounded-md bg-secondary relative overflow-hidden">
                                                 <Image
@@ -97,12 +116,12 @@ export default function AdminDashboard() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex gap-2">
-                                                <Link href={`/admin/products/edit/${product._id}`}>
+                                                <Link href={`/admin/products/edit/${product.id}`}>
                                                     <Button variant="ghost" size="icon">
                                                         <Pencil size={16} />
                                                     </Button>
                                                 </Link>
-                                                <Link href={`/admin/products/delete/${product._id}`}>
+                                                <Link href={`/admin/products/delete/${product.id}`}>
                                                     <Button variant="ghost" size="icon" className="text-destructive">
                                                         <Trash2 size={16} />
                                                     </Button>
@@ -127,7 +146,7 @@ export default function AdminDashboard() {
             <div className="md:hidden space-y-4">
                 {products.length > 0 ? (
                     products.map((product) => (
-                        <div key={product._id.toString()} className="bg-card rounded-lg overflow-hidden shadow border border-border">
+                        <div key={product.id} className="bg-card rounded-lg overflow-hidden shadow border border-border">
                             <div className="flex items-center p-4">
                                 <div className="h-16 w-16 rounded-md bg-secondary relative overflow-hidden flex-shrink-0">
                                     <Image
@@ -153,12 +172,12 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <Link href={`/admin/products/edit/${product._id}`}>
+                                    <Link href={`/admin/products/edit/${product.id}`}>
                                         <Button variant="ghost" size="icon" className="h-8 w-8">
                                             <Pencil size={16} />
                                         </Button>
                                     </Link>
-                                    <Link href={`/admin/products/delete/${product._id}`}>
+                                    <Link href={`/admin/products/delete/${product.id}`}>
                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
                                             <Trash2 size={16} />
                                         </Button>

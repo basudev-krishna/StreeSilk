@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "drive.google.com",
+      },
+      {
+        protocol: "https",
         hostname: "cdn-icons-png.flaticon.com",
       },
       {
@@ -23,7 +27,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "elegant-buzzard-525.convex.cloud",
       },
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+      },
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb',
+    },
   },
 };
 

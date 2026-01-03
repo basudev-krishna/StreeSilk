@@ -20,7 +20,7 @@ export default function ClerkPreload() {
                 });
 
                 const dnsPrefetchDomains = [
-                    'https://clerk.luxera.com',
+                    'https://clerk.streesilk.com',
                     'https://accounts.google.com',
                     'https://connect.facebook.net',
                     'https://appleid.apple.com'

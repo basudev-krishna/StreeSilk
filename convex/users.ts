@@ -22,13 +22,18 @@ export const createOrUpdateUser = mutation({
 
         // Check if this email should be admin
         const adminEmails = [
-            "bidhandhakal365@gmail.com",
-            "saugatoli808@gmail.com",
-            "ironveerfitnessfitness@gmail.com",
-            "abhisanpardhe4@gmail.com"
+            "morningstarryuk@gmail.com",
+            "princedas000555@gmail.com",
+            "theurbanflick@gmail.com"
         ];
 
         const isAdmin = adminEmails.includes(args.email);
+        
+        // Debug logging
+        console.log("Email:", args.email);
+        console.log("Admin emails:", adminEmails);
+        console.log("Is admin:", isAdmin);
+        console.log("Existing user:", existingUser);
 
         if (existingUser) {
             // Update existing user
@@ -39,6 +44,7 @@ export const createOrUpdateUser = mutation({
                 isAdmin: isAdmin,
                 updatedAt: now,
             });
+            console.log("Updated user with isAdmin:", isAdmin);
             return userId;
         } else {
             // Create new user
@@ -144,6 +150,31 @@ export const deleteUser = mutation({
         }
 
         await ctx.db.delete(user._id);
+        return true;
+    },
+});
+
+// Function to manually set admin status
+export const setAdminStatus = mutation({
+    args: { 
+        clerkId: v.string(),
+        isAdmin: v.boolean()
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+            .first();
+
+        if (!user) {
+            throw new ConvexError("User not found");
+        }
+
+        await ctx.db.patch(user._id, {
+            isAdmin: args.isAdmin,
+            updatedAt: Date.now(),
+        });
+
         return true;
     },
 }); 

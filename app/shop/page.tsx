@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Filter } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { getProducts } from "../actions/products";
 
 const categories = [
     "All",
-    "Men's T-Shirts",
-    "Women's T-Shirts",
-    "Sale",
+    "Silk",
+    "Muga",
+    "Paat",
     "New Arrivals",
 ];
 
@@ -20,14 +19,23 @@ export default function ShopPage() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [sortOption, setSortOption] = useState("newest");
     const [visibleProducts, setVisibleProducts] = useState(PRODUCTS_PER_PAGE);
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const productsResult = useQuery(api.products.listProducts, {
-        skipInactive: true
-    });
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const data = await getProducts({ skipInactive: true });
+                setProducts(data);
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-
-    const products = productsResult || [];
-
+        fetchProducts();
+    }, []);
 
     const filteredProducts = products.filter(product => {
         if (selectedCategory === "All") return true;
@@ -69,6 +77,14 @@ export default function ShopPage() {
 
         setVisibleProducts(prev => prev + PRODUCTS_PER_PAGE);
     };
+
+    if (loading) {
+        return (
+            <div className="flex bg-background h-screen items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -137,12 +153,12 @@ export default function ShopPage() {
                     {currentProducts.length > 0 ? (
                         currentProducts.map((product, index) => (
                             <div
-                                key={product._id.toString()}
+                                key={product.id}
                                 className={`${index % 2 === 0 ? "" : "transform translate-y-4"}`}
                             >
                                 <ProductCard
                                     product={{
-                                        id: product._id.toString(),
+                                        id: product.id,
                                         name: product.name,
                                         price: product.price,
                                         originalPrice: product.originalPrice,

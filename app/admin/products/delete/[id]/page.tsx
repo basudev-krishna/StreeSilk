@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
-import { api } from "../../../../../convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
 import { redirect, useParams } from "next/navigation";
 import { Button } from "../../../../components/ui/button";
 import Link from "next/link";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
-import { Id } from "../../../../../convex/_generated/dataModel";
 import Image from "next/image";
+import { getProduct, deleteProduct } from "../../../../actions/products";
+
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS
+    ? process.env.NEXT_PUBLIC_ADMIN_EMAILS.split(",").map(email => email.trim())
+    : [];
 
 export default function DeleteProductPage() {
     const params = useParams();
@@ -19,29 +21,43 @@ export default function DeleteProductPage() {
     const { isLoaded, isSignedIn } = useAuth();
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
-
-    const clerkId = user?.id;
-    const isAdmin = useQuery(api.users.isUserAdmin, clerkId ? { clerkId } : "skip");
-
-    const product = useQuery(api.products.getProduct, {
-        id: id as Id<"products">
-    });
-
-    const deleteProduct = useMutation(api.products.deleteProduct);
+    const [product, setProduct] = useState<any>(null);
 
     useEffect(() => {
-        if (isLoaded) {
-            if (!isSignedIn) {
-                redirect("/");
-            } else if (isAdmin === false) {
-                redirect("/");
-            } else if (isAdmin !== undefined) {
-                setLoading(false);
-            }
-        }
-    }, [isLoaded, isSignedIn, isAdmin]);
+        const init = async () => {
+            if (isLoaded) {
+                if (!isSignedIn) {
+                    redirect("/");
+                    return;
+                }
 
-    if (loading || !product) {
+                const email = user?.primaryEmailAddress?.emailAddress;
+                const isAdmin = email && ADMIN_EMAILS.includes(email);
+
+                if (!isAdmin) {
+                    redirect("/");
+                    return;
+                }
+
+                try {
+                    const fetchedProduct = await getProduct(id);
+                    if (fetchedProduct) {
+                        setProduct(fetchedProduct);
+                    } else {
+                        // Product not found logic
+                    }
+                } catch (error) {
+                    console.error("Error fetching product:", error);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        init();
+    }, [isLoaded, isSignedIn, user, id]);
+
+    if (loading) {
         return (
             <div className="flex h-screen items-center justify-center">
                 <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
@@ -49,17 +65,24 @@ export default function DeleteProductPage() {
         );
     }
 
+    if (!product) {
+        return (
+            <div className="container mx-auto px-4 py-8 text-center bg-background text-foreground">
+                <p>Product not found.</p>
+                <Link href="/admin">
+                    <Button variant="outline" className="mt-4">Back to Dashboard</Button>
+                </Link>
+            </div>
+        );
+    }
+
     const handleDeleteProduct = async () => {
-        if (!clerkId) return;
+        if (!user?.id) return;
 
         setDeleting(true);
 
         try {
-            await deleteProduct({
-                id: id as Id<"products">,
-                clerkId: clerkId
-            });
-
+            await deleteProduct(id);
             window.location.href = "/admin";
         } catch (error) {
             console.error("Error deleting product:", error);

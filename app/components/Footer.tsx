@@ -11,14 +11,14 @@ export default function Footer() {
                     {/* Brand */}
                     <div className="flex items-center gap-2">
                         <Image
-                            src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/phalcon/phalcon-plain.svg"
-                            alt="Pyuto Logo"
+                            src="/logo.png"
+                            alt="StreeSilk Logo"
                             width={24}
                             height={24}
                             className="h-6 w-auto"
                         />
                         <span className="font-bold text-foreground">
-                            Luxera
+                            StreeSilk
                         </span>
                     </div>
 
@@ -46,7 +46,7 @@ export default function Footer() {
 
                     {/* Copyright */}
                     <div className="text-sm text-muted-foreground">
-                        <p>© {currentYear} Luxera</p>
+                        <p>© {currentYear} StreeSilk</p>
                     </div>
                 </div>
             </div>

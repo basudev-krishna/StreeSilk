@@ -2,67 +2,86 @@
 
 import Link from "next/link";
 import ProductCard from "./ProductCard";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useEffect, useState } from "react";
 
 export default function FeaturedProducts() {
-    const productsResult = useQuery(api.products.listProducts, {
-        skipInactive: true,
-        limit: 4
-    });
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const products = productsResult || [];
+    useEffect(() => {
+        // Fetch products using Server Action
+        const fetchProducts = async () => {
+            try {
+                // Dynamically import to avoid server-side issues if any
+                const { getProducts } = await import("../actions/products");
+                const data = await getProducts({ limit: 4, skipInactive: true });
+                setProducts(data);
+            } catch (error) {
+                console.error("Failed to fetch featured products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     return (
-        <section className="py-20 bg-background">
+        <section className="py-32 bg-[#fafaf9] dark:bg-[#0c0a09]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                    <h2 className="mb-3">
+                <div className="text-center mb-20">
+                    <span className="text-xs font-medium text-amber-600/80 dark:text-amber-500/80 uppercase tracking-[0.3em] mb-4 block">
+                        Selections
+                    </span>
+                    <h2 className="text-4xl sm:text-5xl font-serif font-thin text-stone-900 dark:text-white mb-6 tracking-tight">
                         Featured Collection
                     </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
-                        Discover our handpicked selection of premium t-shirts designed for comfort and style
+                    <p className="text-stone-600 dark:text-stone-400 max-w-2xl mx-auto font-light">
+                        Discover our handpicked selection of premium silks designed for elegance and comfort.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-                    {products.length > 0 ? (
-                        products.map((product) => (
-                            <ProductCard
-                                key={product._id.toString()}
-                                product={{
-                                    id: product._id.toString(),
-                                    name: product.name,
-                                    price: product.price,
-                                    originalPrice: product.originalPrice,
-                                    image: product.image,
-                                    category: product.category,
-                                    stockQuantity: product.stock
-                                }}
-                            />
-                        ))
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    {!loading ? (
+                        products.length > 0 ? (
+                            products.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={{
+                                        id: product.id,
+                                        name: product.name,
+                                        price: product.price,
+                                        originalPrice: product.originalPrice,
+                                        image: product.image,
+                                        category: product.category,
+                                        stockQuantity: product.stock
+                                    }}
+                                />
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center text-stone-500 py-10">
+                                No featured products available.
+                            </div>
+                        )
                     ) : (
                         Array(4).fill(0).map((_, index) => (
                             <div
                                 key={index}
-                                className="bg-secondary h-72 sm:h-96 rounded-lg animate-pulse"
+                                className="bg-stone-200 dark:bg-stone-800 h-72 sm:h-96 rounded-lg animate-pulse"
                             />
                         ))
                     )}
                 </div>
 
-                <div className="mt-12 text-center">
+                <div className="mt-20 text-center">
                     <Link
                         href="/shop"
-                        className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors font-semibold"
+                        className="inline-flex items-center px-10 py-4 border border-stone-300 dark:border-stone-700 hover:border-stone-900 dark:hover:border-white text-stone-900 dark:text-white rounded-none transition-all duration-300 uppercase tracking-widest text-xs font-medium"
                     >
                         View All Products
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
                     </Link>
                 </div>
             </div>
         </section>
     );
-} 
+}

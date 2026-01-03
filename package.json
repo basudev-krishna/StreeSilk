@@ -1,5 +1,5 @@
 {
-  "name": "pyuto",
+  "name": "streesilk",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,22 +9,29 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.962.0",
+    "@aws-sdk/client-s3": "^3.962.0",
+    "@aws-sdk/lib-dynamodb": "^3.962.0",
     "@clerk/nextjs": "^6.19.2",
     "@clerk/themes": "^2.2.44",
     "@motionone/utils": "^10.18.0",
     "@radix-ui/react-slot": "^1.2.2",
+    "@types/uuid": "^10.0.0",
     "@vercel/analytics": "^1.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.24.1",
-    "framer-motion": "^12.11.3",
+    "dotenv": "^17.2.3",
+    "framer-motion": "^12.23.24",
     "lucide-react": "^0.510.0",
+    "motion": "^12.23.24",
     "next": "15.3.2",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "svix": "^1.65.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

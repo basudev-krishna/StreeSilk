@@ -55,9 +55,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     };
 
-    if (!authLoaded) {
-        return null;
-    }
+    // if (!authLoaded) {
+    //     return null;
+    // }
 
     return (
         <AuthContext.Provider
