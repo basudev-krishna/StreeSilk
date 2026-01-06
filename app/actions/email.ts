@@ -66,3 +66,47 @@ export async function sendOrderEmail(orderData: any) {
         // We don't throw here to avoid failing the order if email fails
     }
 }
+
+export async function sendContactEmail(contactData: {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+}) {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+        console.warn("Skipping email sending: GMAIL_USER or GMAIL_APP_PASSWORD not set.");
+        return;
+    }
+
+    const { name, email, subject, message } = contactData;
+
+    const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: "streesilk41@gmail.com",
+        replyTo: email, // Allow replying directly to the sender
+        subject: `Contact Form: ${subject}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #333;">New Contact Message</h2>
+                <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Subject:</strong> ${subject}</p>
+                </div>
+                
+                <h3>Message:</h3>
+                <div style="border-left: 4px solid #ddd; padding-left: 15px; margin-top: 10px;">
+                    <p style="white-space: pre-wrap;">${message}</p>
+                </div>
+            </div>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Contact email sent from ${email}`);
+    } catch (error) {
+        console.error("Error sending contact email:", error);
+        // Don't throw, just log
+    }
+}

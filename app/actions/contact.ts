@@ -4,6 +4,7 @@ import { db, TableNames } from "@/lib/dynamodb";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { currentUser } from "@clerk/nextjs/server";
+import { sendContactEmail } from "./email";
 
 export async function submitContactMessage(data: {
     name: string;
@@ -27,6 +28,15 @@ export async function submitContactMessage(data: {
             TableName: TableNames.CONTACTS, // Corrected table name
             Item: message,
         }));
+
+        // Send email notification
+        await sendContactEmail({
+            name: data.name,
+            email: data.email,
+            subject: data.subject,
+            message: data.message
+        });
+
         return id;
     } catch (error) {
         console.error("Error submitting contact message:", error);
