@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Filter, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "../components/ProductCard";
+import Link from "next/link";
+import Image from "next/image";
 import { getProducts } from "../actions/products";
 
 const categories = [
@@ -135,10 +137,11 @@ export default function ShopPage() {
             <div className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0">
-                    <img
+                    <Image
                         src="/banner.jpeg"
                         alt="Background"
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-stone-50 dark:to-zinc-950"></div>
                 </div>

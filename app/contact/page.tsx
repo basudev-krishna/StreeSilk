@@ -165,7 +165,7 @@ export default function ContactPage() {
 
             {submitSuccess && (
                 <div className="bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 mb-6">
-                    <p className="text-green-800 dark:text-green-300 font-medium">Thank you for your message! We'll get back to you soon.</p>
+                    <p className="text-green-800 dark:text-green-300 font-medium">Thank you for your message! We&apos;ll get back to you soon.</p>
                 </div>
             )}
 
@@ -250,7 +250,7 @@ export default function ContactPage() {
                             Get In Touch
                         </h1>
                         <p className="text-white/90 text-sm sm:text-base md:text-lg max-w-xl mx-auto drop-shadow-md">
-                            We're here to help! Reach out to us for support, sales, or partnership inquiries.
+                            We&apos;re here to help! Reach out to us for support, sales, or partnership inquiries.
                         </p>
                     </div>
                 </div>

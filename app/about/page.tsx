@@ -76,10 +76,10 @@ export default function AboutPage() {
                             </h2>
                         </div>
                         <p className="text-lg leading-relaxed text-stone-600 dark:text-stone-400 font-light">
-                            Stree Silk was born from a desire to preserve the vanishing art of hand-loomed textiles. Rooted in the ancient town of <strong>Sualkuchi</strong>, often called the "Manchester of the East," our journey began with the golden thread of <span className="text-amber-600 dark:text-amber-500 font-serif italic">Muga Silk</span>.
+                            Stree Silk was born from a desire to preserve the vanishing art of hand-loomed textiles. Rooted in the ancient town of <strong>Sualkuchi</strong>, often called the &quot;Manchester of the East,&quot; our journey began with the golden thread of <span className="text-amber-600 dark:text-amber-500 font-serif italic">Muga Silk</span>.
                         </p>
                         <p className="text-lg leading-relaxed text-stone-600 dark:text-stone-400 font-light">
-                            We believe that a saree is not just a garment; it is a story woven in six yards of history. Every thread tells a tale of the artisan's patience, the rhythmic clatter of the loom, and the timeless beauty of Indian royalty.
+                            We believe that a saree is not just a garment; it is a story woven in six yards of history. Every thread tells a tale of the artisan&apos;s patience, the rhythmic clatter of the loom, and the timeless beauty of Indian royalty.
                         </p>
                         <div className="h-1 w-20 bg-amber-500"></div>
                     </motion.div>

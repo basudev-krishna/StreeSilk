@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 
@@ -8,7 +8,7 @@ interface PageTransitionProps {
     children: ReactNode;
 }
 
-const variants = {
+const variants: Variants = {
     hidden: {
         opacity: 0,
         y: 10,

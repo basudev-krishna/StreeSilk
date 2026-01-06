@@ -150,7 +150,7 @@ export default function Home() {
                             Weaving <span className="italic text-amber-700 dark:text-amber-500/90 font-light">Elegance</span> into <br className="hidden md:block" /> Every Thread.
                         </h2>
                         <p className="text-lg text-stone-600 dark:text-stone-400 max-w-xl mx-auto font-light leading-8">
-                            StreeSilk isn't just a label; it's a revival of Assamese heritage, crafted for the modern connoisseur.
+                            StreeSilk isn&apos;t just a label; it&apos;s a revival of Assamese heritage, crafted for the modern connoisseur.
                         </p>
                     </motion.div>
 
@@ -171,7 +171,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="text-3xl font-serif font-light text-stone-900 dark:text-white mb-4">Authentic Heritage</h3>
                                 <p className="text-stone-600 dark:text-stone-400 leading-relaxed font-light">
-                                    Sourced directly from Sualkuchi's master weavers. We champion 100% pure Muga, Pat, and Eri silk, preserving a legacy that dates back centuries.
+                                    Sourced directly from Sualkuchi&apos;s master weavers. We champion 100% pure Muga, Pat, and Eri silk, preserving a legacy that dates back centuries.
                                 </p>
                             </div>
                         </motion.div>

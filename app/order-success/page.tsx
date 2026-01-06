@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,18 @@ import { formatPrice } from "@/lib/formatters";
 import { getOrder } from "@/app/actions/order";
 
 export default function OrderSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        }>
+            <OrderSuccessContent />
+        </Suspense>
+    );
+}
+
+function OrderSuccessContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get("orderId");
     const [order, setOrder] = useState<any>(null);
