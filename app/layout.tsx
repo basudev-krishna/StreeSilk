@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import { Geist_Mono } from "next/font/google";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
@@ -15,6 +16,12 @@ import PageWrapper from "./page-wrapper";
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const mistral = localFont({
+  src: "./fonts/mistral.ttf",
+  variable: "--font-mistral",
+  display: "swap",
 });
 
 const montserrat = Montserrat({
@@ -61,7 +68,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${geistMono.variable} ${montserrat.variable} antialiased min-h-screen flex flex-col bg-background`}
+        className={`${geistMono.variable} ${montserrat.variable} ${mistral.variable} antialiased min-h-screen flex flex-col bg-background`}
       >
         <ClerkClientProvider>
           <ClientProviders>

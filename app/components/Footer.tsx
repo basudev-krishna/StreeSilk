@@ -50,6 +50,17 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
+
+            {/* Credits */}
+            <div className="mt-8 pt-6 border-t border-border/40 text-center">
+                <Link
+                    href="https://wa.me/918822990854?text=Hi%2C%20I%20loved%20the%20StreeSilk%20website%21%20I%27m%20interested%20in%20knowing%20more%20about%20your%20web%20design%20services."
+                    target="_blank"
+                    className="text-xs text-muted-foreground hover:text-amber-500 transition-colors inline-flex items-center gap-1.5 font-medium tracking-wide"
+                >
+                    Made by UrbanFlick Studios with <span>❤️</span>
+                </Link>
+            </div>
         </footer>
     );
 } 

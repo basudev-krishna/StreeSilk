@@ -18,6 +18,7 @@ const TableNames = {
     PRODUCTS: process.env.DYNAMODB_TABLE_PRODUCTS || "Products",
     CART: process.env.DYNAMODB_TABLE_CART || "CartItems",
     CONTACTS: process.env.DYNAMODB_TABLE_CONTACTS || "ContactMessages",
+    ORDERS: process.env.DYNAMODB_TABLE_ORDERS || "Orders",
 };
 
 const tables = [
@@ -47,6 +48,12 @@ const tables = [
     },
     {
         TableName: TableNames.CONTACTS,
+        KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
+        AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
+        BillingMode: "PAY_PER_REQUEST",
+    },
+    {
+        TableName: TableNames.ORDERS,
         KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
         AttributeDefinitions: [{ AttributeName: "id", AttributeType: "S" }],
         BillingMode: "PAY_PER_REQUEST",

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import FeaturedProducts from "./components/FeaturedProducts";
 import { ShoppingBag, Star, TrendingUp, CheckCircle2, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 // --- Animation Variants (kept the same) ---
 const cardVariants = {
@@ -12,7 +12,7 @@ const cardVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
 };
 
-const marqueeVariants = {
+const marqueeVariants: Variants = {
     animate: {
         x: ['0%', '-100%'],
         transition: {
@@ -32,19 +32,19 @@ export default function Home() {
         <>
             {/* 🌟 Hero Section (ALIGNED LEFT) */}
             <section className="relative overflow-hidden min-h-[60vh] md:min-h-[95vh] flex items-center justify-center bg-black pt-20 md:pt-0">
-                <div className="absolute inset-0 z-2">
+                <div className="absolute inset-0 z-0">
                     <Image
                         src="/hero1.png"
                         alt="T-shirt collection background"
                         fill
                         priority
                         sizes="100vw"
-                        className="object-cover object-center brightness-[0.7]"
+                        className="object-cover object-right md:object-center brightness-[0.7] mt-16 md:mt-16"
                     />
                 </div>
 
-                {/* Gradient Overlay for Text Clarity */}
-                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 to-transparent"></div>
+                {/* Gradient Overlay for Text Clarity - z-1 ensures it is above image (z-0) but below text (z-10) */}
+                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/30 to-transparent"></div>
 
                 {/* Text and Buttons Container - Changed text-center to text-left and adjusted margins */}
                 <div className="relative z-10 w-full text-left px-8 sm:px-12 max-w-5xl md:pl-20 lg:pl-40">
@@ -52,9 +52,9 @@ export default function Home() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 tracking-tighter leading-none uppercase drop-shadow-xl"
+                        className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-mistral text-white mb-4 sm:mb-6 tracking-wide leading-none drop-shadow-xl"
                     >
-                        স্ত্রী চিল্ক - Stree Silk
+                        স্ত্রী চিল্ক  Stree Silk
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -192,7 +192,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="text-3xl font-serif font-light text-stone-900 dark:text-white mb-4">Woven Artistry</h3>
                                 <p className="text-stone-600 dark:text-stone-400 leading-relaxed font-light">
-                                    Where the ancient *Jaapi* and *Xorai* motifs find new life in contemporary cuts. Wearable art designed for the modern woman who values tradition.
+                                    Where the ancient Jaapi and Xorai motifs find new life in contemporary cuts. Wearable art designed for the modern woman who values tradition.
                                 </p>
                             </div>
                         </motion.div>
@@ -235,7 +235,7 @@ export default function Home() {
                             viewport={{ once: true }}
                         >
                             <Image
-                                src="https://images.unsplash.com/photo-1616756351484-798f37bdffa0?q=80&w=1074&auto=format&fit=crop&"
+                                src="/post3jan.jpg"
                                 alt="Ethical sourcing and quality materials"
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -286,7 +286,7 @@ export default function Home() {
                 {/* Background Image Parallax */}
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src="https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=1600&auto=format&fit=crop&q=80"
+                        src="/banner.jpeg"
                         alt="New Collection"
                         fill
                         className="object-cover object-center brightness-[0.3] scale-105"
@@ -306,7 +306,7 @@ export default function Home() {
                             New Season <span className="italic block sm:inline">Arrivals</span>
                         </h2>
                         <p className="text-lg sm:text-xl text-white/80 mb-12 max-w-lg mx-auto font-light leading-relaxed">
-                            Be the first to explore. Sign up for our newsletter today and receive <span className="text-amber-200">20% off</span> your first order.
+                            Get the best Quality Assamese Silk at the best price.
                         </p>
                         <Link
                             href="/shop"
@@ -315,83 +315,6 @@ export default function Home() {
                             Explore Collection
                         </Link>
                     </motion.div>
-                </div>
-            </section>
-
-
-            {/* ⭐ Testimonials: Clean Minimalist */}
-            <section className="py-32 bg-[#fafaf9] dark:bg-[#0c0a09]">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        className="text-center mb-20"
-                    >
-                        <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 dark:text-white mb-4 tracking-tight">
-                            Voices of Elegance
-                        </h2>
-                        <div className="h-px w-20 bg-stone-200 dark:bg-stone-800 mx-auto"></div>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        {/* Testimonial Card 1 */}
-                        <motion.div
-                            className="bg-white dark:bg-white/5 p-10 shadow-sm dark:shadow-none hover:shadow-xl dark:hover:bg-white/10 transition-all duration-500"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                            viewport={{ once: true }}
-                        >
-                            <div className="flex items-center mb-8 text-amber-500 dark:text-amber-400 space-x-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} size={14} fill="currentColor" strokeWidth={0} />
-                                ))}
-                            </div>
-                            <blockquote className="text-lg text-stone-600 dark:text-stone-300 mb-8 font-light italic leading-relaxed">
-                                &quot;The most comfortable silk I&apos;ve ever worn. The quality is outstanding and it fits perfectly. Truly a piece of art.&quot;
-                            </blockquote>
-                            <p className="font-medium text-stone-900 dark:text-white text-sm tracking-wider uppercase">— Emily J.</p>
-                        </motion.div>
-
-                        {/* Testimonial Card 2 */}
-                        <motion.div
-                            className="bg-white dark:bg-white/5 p-10 shadow-sm dark:shadow-none hover:shadow-xl dark:hover:bg-white/10 transition-all duration-500"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.1 }}
-                            viewport={{ once: true }}
-                        >
-                            <div className="flex items-center mb-8 text-amber-500 dark:text-amber-400 space-x-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} size={14} fill="currentColor" strokeWidth={0} />
-                                ))}
-                            </div>
-                            <blockquote className="text-lg text-stone-600 dark:text-stone-300 mb-8 font-light italic leading-relaxed">
-                                &quot;I love the modern designs. The fabric is incredibly soft. It has become my go-to for both casual and smart wear.&quot;
-                            </blockquote>
-                            <p className="font-medium text-stone-900 dark:text-white text-sm tracking-wider uppercase">— Marcus T.</p>
-                        </motion.div>
-
-                        {/* Testimonial Card 3 */}
-                        <motion.div
-                            className="bg-white dark:bg-white/5 p-10 shadow-sm dark:shadow-none hover:shadow-xl dark:hover:bg-white/10 transition-all duration-500"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            viewport={{ once: true }}
-                        >
-                            <div className="flex items-center mb-8 text-amber-500 dark:text-amber-400 space-x-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} size={14} fill="currentColor" strokeWidth={0} />
-                                ))}
-                            </div>
-                            <blockquote className="text-lg text-stone-600 dark:text-stone-300 mb-8 font-light italic leading-relaxed">
-                                &quot;Exceptional quality that holds up. The color stays vibrant. Fast delivery too! Highly recommend StreeSilk.&quot;
-                            </blockquote>
-                            <p className="font-medium text-stone-900 dark:text-white text-sm tracking-wider uppercase">— Sarah K.</p>
-                        </motion.div>
-                    </div>
                 </div>
             </section>
         </>

@@ -41,7 +41,7 @@ export default function NewProductPage() {
         description: "",
         price: 0,
         originalPrice: 0,
-        image: "",
+        images: [] as string[],
         category: "",
         sizes: "",
         colors: "",
@@ -95,7 +95,7 @@ export default function NewProductPage() {
                 description: formData.description || undefined,
                 price: formData.price,
                 originalPrice: formData.originalPrice > 0 ? formData.originalPrice : undefined,
-                image: formData.image,
+                images: formData.images,
                 category: formData.category,
                 sizes: sizesArray,
                 colors: colorsArray,
@@ -161,52 +161,70 @@ export default function NewProductPage() {
 
                         {/* Image Upload */}
                         <div>
-                            <label className="block mb-2 font-medium">Product Image</label>
+                            <label className="block mb-2 font-medium">Product Images (Max 3)</label>
 
                             <div className="flex flex-col gap-4">
-                                {formData.image && (
-                                    <div className="relative w-full h-48 sm:h-64 bg-secondary rounded-md overflow-hidden">
-                                        <img
-                                            src={formData.image}
-                                            alt="Preview"
-                                            className="w-full h-full object-contain"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData(prev => ({ ...prev, image: "" }))}
-                                            className="absolute top-2 right-2 bg-destructive text-destructive-foreground p-1 rounded-full hover:bg-destructive/90"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
-                                        </button>
-                                    </div>
-                                )}
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    {formData.images.map((img, index) => (
+                                        <div key={index} className="relative w-full h-32 bg-secondary rounded-md overflow-hidden group">
+                                            <img
+                                                src={img}
+                                                alt={`Product ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(prev => ({
+                                                    ...prev,
+                                                    images: prev.images.filter((_, i) => i !== index)
+                                                }))}
+                                                className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-80 hover:opacity-100 transition-opacity"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
+                                            </button>
+                                        </div>
+                                    ))}
 
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={async (e) => {
-                                            const file = e.target.files?.[0];
-                                            if (!file) return;
+                                    {formData.images.length < 3 && (
+                                        <div className="border-2 border-dashed border-border rounded-md flex items-center justify-center p-4 hover:bg-secondary/50 transition-colors h-32 relative">
+                                            {uploading ? (
+                                                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
+                                            ) : (
+                                                <>
+                                                    <span className="text-3xl text-muted-foreground font-light">+</span>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (!file) return;
 
-                                            setUploading(true);
-                                            const data = new FormData();
-                                            data.append("file", file);
+                                                            setUploading(true);
+                                                            const data = new FormData();
+                                                            data.append("file", file);
 
-                                            const result = await uploadImage(data);
+                                                            const result = await uploadImage(data);
 
-                                            if (result.success && result.url) {
-                                                setFormData(prev => ({ ...prev, image: result.url }));
-                                            } else {
-                                                alert("Failed to upload image");
-                                            }
-                                            setUploading(false);
-                                        }}
-                                        className="w-full p-2 border border-border rounded-md bg-background file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                                    />
-                                    {uploading && <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>}
+                                                            if (result.success && result.url) {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    images: [...prev.images, result.url]
+                                                                }));
+                                                            } else {
+                                                                alert("Failed to upload image");
+                                                            }
+                                                            setUploading(false);
+                                                            // Reset input
+                                                            e.target.value = "";
+                                                        }}
+                                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    />
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                                <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, WEBP</p>
+                                <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, WEBP. First image will be the main cover.</p>
                             </div>
                         </div>
 

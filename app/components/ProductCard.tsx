@@ -19,9 +19,10 @@ interface ProductCardProps {
         stockQuantity?: number;
     };
     hideAddToCart?: boolean;
+    variant?: "default" | "ghost";
 }
 
-export default function ProductCard({ product, hideAddToCart = false }: ProductCardProps) {
+export default function ProductCard({ product, hideAddToCart = false, variant = "default" }: ProductCardProps) {
     const isOnSale = product.originalPrice && product.originalPrice > product.price;
     const slug = product.slug || product.id;
     const productUrl = `/products/${slug}`;
@@ -39,8 +40,12 @@ export default function ProductCard({ product, hideAddToCart = false }: ProductC
         return <span className="text-xs text-emerald-600 dark:text-emerald-500 font-medium">In stock: {stock}</span>;
     };
 
+    const containerClasses = variant === "default"
+        ? "group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-md"
+        : "group relative overflow-hidden rounded-lg transition-all"; // Ghost has no border/bg/shadow by default
+
     return (
-        <div className="group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-md">
+        <div className={containerClasses}>
             {/* Product image - reduced height on mobile */}
             <Link href={productUrl} className="relative block h-48 sm:h-64 overflow-hidden bg-secondary">
                 <Image

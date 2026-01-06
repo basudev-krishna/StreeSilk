@@ -34,7 +34,7 @@ async function isUserAdmin() {
     }
 }
 
-export async function getProducts(options?: { limit?: number; category?: string; skipInactive?: boolean }) {
+export async function getProducts(options?: { limit?: number; category?: string; skipInactive?: boolean; query?: string }) {
     try {
         const command = new ScanCommand({
             TableName: TableNames.PRODUCTS,
@@ -51,6 +51,15 @@ export async function getProducts(options?: { limit?: number; category?: string;
         // Filter inactive
         if (options?.skipInactive) {
             products = products.filter((p) => p.isActive === true);
+        }
+
+        // Filter by search query
+        if (options?.query) {
+            const lowerQuery = options.query.toLowerCase();
+            products = products.filter((p) =>
+                p.name.toLowerCase().includes(lowerQuery) ||
+                (p.description && p.description.toLowerCase().includes(lowerQuery))
+            );
         }
 
         // Sort by createdAt desc (Newest first)
@@ -92,6 +101,8 @@ export async function createProduct(data: any) {
     const product = {
         id,
         ...data,
+        image: data.images?.[0] || data.image, // Main image for backward compatibility
+        images: data.images || (data.image ? [data.image] : []), // Array of images
         createdAt: now,
         updatedAt: now,
     };
@@ -130,6 +141,8 @@ export async function updateProduct(id: string, data: any) {
         const updated = {
             ...current,
             ...data,
+            image: data.images?.[0] || data.image || current.image, // Ensure main image exists
+            images: data.images || (data.image ? [data.image] : current.images || [current.image]), // Ensure array exists
             updatedAt: now,
             id // ensure ID doesn't change
         };

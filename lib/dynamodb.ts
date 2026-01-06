@@ -20,4 +20,5 @@ export const TableNames = {
     PRODUCTS: process.env.DYNAMODB_TABLE_PRODUCTS || "Products",
     CART: process.env.DYNAMODB_TABLE_CART || "CartItems",
     CONTACTS: process.env.DYNAMODB_TABLE_CONTACTS || "ContactMessages",
+    ORDERS: process.env.DYNAMODB_TABLE_ORDERS || "Orders",
 };

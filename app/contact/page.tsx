@@ -13,18 +13,16 @@ import { submitContactMessage } from "../actions/contact";
 // --- Constants ---
 const GUWAHATI_ADDRESS = "Ganeshguri, Guwahati, Assam, India - 781006"; // Specific Demo Address
 const CONTACT_INFO = {
-    email1: "support@streesilk.com",
-    email2: "sales@streesilk.com",
-    phone: "+91 98765 43210",
+    email1: "streesilk41@gmail.com",
+    email2: "streesilk41@gmail.com",
+    phone: "+91 8638248982",
     address: GUWAHATI_ADDRESS,
-    // NOTE: This URL should be replaced with the actual Google Maps iframe source for Guwahati for it to function correctly.
-    mapEmbedUrl: `https://www.google.com/maps/search/streesilk/@26.1750589,91.7460188,16z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI1MTEyMy4xIKXMDSoASAFQAw%3D%3D`
 };
 
 const SOCIAL_LINKS = {
-    instagram: "https://www.instagram.com/streesilk",
-    facebook: "https://www.facebook.com/streesilkofficial",
-    whatsapp: "https://wa.me/919876543210"
+    instagram: "https://www.instagram.com/stree.silk?igsh=MW0weGR4OXczdWl1aQ==",
+    facebook: "https://www.facebook.com/share/1FBKFeWxxz/",
+    whatsapp: "https://wa.me/918638248982"
 };
 
 // --- Main Component ---
@@ -95,30 +93,7 @@ export default function ContactPage() {
 
     // --- Components for Bento Layout ---
 
-    // 1. Map/Location Bento Item
-    const MapBentoItem = () => (
-        <div className="bg-card rounded-xl p-4 sm:p-6 border border-border/70 shadow-lg h-full flex flex-col overflow-hidden md:col-span-3">
-            <h3 className="text-xl font-semibold mb-3 flex items-center gap-2 text-primary">
-                <MapPin size={20} /> Our Location in Guwahati
-            </h3>
-            {/* The responsive iframe container */}
-            <div className="relative w-full overflow-hidden flex-grow" style={{ paddingBottom: '30%' }}>
-                <iframe
-                    src={CONTACT_INFO.mapEmbedUrl}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0, position: 'absolute', top: 0, left: 0 }}
-                    allowFullScreen={false}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Google Maps Location: Guwahati"
-                ></iframe>
-            </div>
-            <p className="text-muted-foreground mt-3 text-sm">
-                **Address:** {CONTACT_INFO.address}
-            </p>
-        </div>
-    );
+
 
     // 2. Contact Details Bento Item (FIXED: Address restored here)
     const DetailsBentoItem = () => (
@@ -145,7 +120,7 @@ export default function ContactPage() {
                 <div>
                     <h4 className="font-medium text-foreground">Sales & Inquiries</h4>
                     <p className="text-muted-foreground text-sm">{CONTACT_INFO.phone}</p>
-                    <p className="text-muted-foreground text-sm">Mon-Fri: 9am - 5pm IST</p>
+                    <p className="text-muted-foreground text-sm">Mon-Fri: 10am - 8pm IST</p>
                 </div>
             </div>
 
@@ -289,8 +264,7 @@ export default function ContactPage() {
                     <FormBentoItem />
                     <DetailsBentoItem />
 
-                    {/* Row 2: Map (3/3) */}
-                    <MapBentoItem />
+
                 </div>
             </div>
         </>

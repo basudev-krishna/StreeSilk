@@ -13,6 +13,7 @@ import { useAuth as useClerkAuth, useClerk, UserButton, useUser } from "@clerk/n
 const navLinks = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
+    { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
 ];
 
@@ -127,7 +128,7 @@ export default function Navbar() {
                                 </div>
                             )}
                             {/* Elevated Brand Title */}
-                            <span className="text-2xl font-extrabold tracking-widest uppercase text-foreground hover:text-primary transition-colors">
+                            <span className="text-2xl font-bold tracking-wide text-foreground hover:text-primary transition-colors">
                                 স্ত্রী চিল্ক
                             </span>
                         </Link>

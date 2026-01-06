@@ -11,6 +11,7 @@ import AddToCartButton from "../../components/AddToCartButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { getProduct, getProducts } from "../../actions/products";
 
+
 export default function ProductDetailPage() {
     const { slug } = useParams();
     const productId = slug as string;
@@ -28,6 +29,10 @@ export default function ProductDetailPage() {
     const [isDesktop, setIsDesktop] = useState(false);
     const imageContainerRef = useRef<HTMLDivElement>(null);
 
+    const [activeImage, setActiveImage] = useState<string | null>(null);
+
+    // ... existing refs and state ...
+
     useEffect(() => {
         const fetchData = async () => {
             if (!productId) return;
@@ -36,6 +41,10 @@ export default function ProductDetailPage() {
                 setProduct(fetchedProduct);
 
                 if (fetchedProduct) {
+                    // Set initial active image
+                    const initialImage = fetchedProduct.images?.[0] || fetchedProduct.image;
+                    setActiveImage(initialImage);
+
                     const allProducts = await getProducts({ skipInactive: true });
                     setRelatedProducts(allProducts);
 
@@ -55,7 +64,6 @@ export default function ProductDetailPage() {
 
         fetchData();
     }, [productId]);
-
 
     const filteredRelatedProducts = relatedProducts?.filter(p =>
         p.category === product?.category &&
@@ -79,6 +87,64 @@ export default function ProductDetailPage() {
             }
         }
     }, []);
+
+    // --- Share & Like Logic ---
+    const [isLiked, setIsLiked] = useState(false);
+    const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && product) {
+            const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+            setIsLiked(wishlist.includes(product.id));
+        }
+    }, [product]);
+
+    const showFeedback = (msg: string) => {
+        setFeedbackMessage(msg);
+        setTimeout(() => setFeedbackMessage(null), 3000);
+    };
+
+    const toggleLike = () => {
+        if (!product) return;
+        const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+        let newWishlist;
+
+        if (isLiked) {
+            newWishlist = wishlist.filter((id: string) => id !== product.id);
+            showFeedback("Removed from wishlist");
+        } else {
+            newWishlist = [...wishlist, product.id];
+            showFeedback("Added to wishlist");
+        }
+
+        localStorage.setItem("wishlist", JSON.stringify(newWishlist));
+        setIsLiked(!isLiked);
+    };
+
+    const handleShare = async () => {
+        if (!product) return;
+        const shareData = {
+            title: `Stree Silk - ${product.name}`,
+            text: `Check out this amazing ${product.name} on Stree Silk!`,
+            url: window.location.href,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log("Error sharing:", err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                showFeedback("Link copied to clipboard!");
+            } catch (err) {
+                showFeedback("Failed to copy link.");
+            }
+        }
+    };
+    // --------------------------
 
     if (loading) {
         return (
@@ -122,6 +188,10 @@ export default function ProductDetailPage() {
         setZoomPosition({ x, y });
     };
 
+    // Derived images array for consistent usage
+    const productImages = product?.images?.length ? product.images : (product?.image ? [product.image] : []);
+    const currentDisplayImage = activeImage || product?.image;
+
     return (
         <div className="min-h-screen bg-background pt-24 pb-20">
             {/* Breadcrumbs */}
@@ -148,12 +218,12 @@ export default function ProductDetailPage() {
                             {/* Blurred Background for Fill */}
                             <div
                                 className="absolute inset-0 bg-cover bg-center opacity-20 blur-3xl scale-110"
-                                style={{ backgroundImage: `url(${product.image})` }}
+                                style={{ backgroundImage: `url(${currentDisplayImage})` }}
                             ></div>
 
                             {/* Main Image - Contain to show fully */}
                             <Image
-                                src={product.image}
+                                src={currentDisplayImage}
                                 alt={product.name}
                                 fill
                                 className={`relative z-10 object-contain p-4 sm:p-8 transition-transform duration-300 ease-out ${isZoomed && isDesktop ? 'scale-150' : 'scale-100'}`}
@@ -177,6 +247,28 @@ export default function ProductDetailPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Thumbnails */}
+                        {productImages.length > 1 && (
+                            <div className="flex gap-4 overflow-x-auto pb-2">
+                                {productImages.map((img: string, idx: number) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveImage(img)}
+                                        className={`relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 border-2 rounded-sm overflow-hidden transition-all
+                                            ${activeImage === img ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-border'}
+                                        `}
+                                    >
+                                        <Image
+                                            src={img}
+                                            alt={`${product.name} view ${idx + 1}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* 📝 Product Details Section (Sticky) */}
@@ -192,13 +284,28 @@ export default function ProductDetailPage() {
                                     <p className="text-sm font-medium tracking-[0.2em] uppercase text-muted-foreground">
                                         {product.category}
                                     </p>
-                                    <div className="flex items-center gap-3">
-                                        <button className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary">
+                                    <div className="relative flex items-center gap-3">
+                                        <button
+                                            onClick={handleShare}
+                                            className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary"
+                                            title="Share Product"
+                                        >
                                             <Share2 size={18} />
                                         </button>
-                                        <button className="text-muted-foreground hover:text-destructive transition-colors p-2 rounded-full hover:bg-secondary">
-                                            <Heart size={18} />
+                                        <button
+                                            onClick={toggleLike}
+                                            className={`transition-colors p-2 rounded-full hover:bg-secondary ${isLiked ? "text-red-500 fill-red-500 hover:text-red-600" : "text-muted-foreground hover:text-destructive"
+                                                }`}
+                                            title={isLiked ? "Remove from Wishlist" : "Add to Wishlist"}
+                                        >
+                                            <Heart size={18} className={isLiked ? "fill-current" : ""} />
                                         </button>
+
+                                        {feedbackMessage && (
+                                            <span className="absolute top-full right-0 mt-2 text-xs text-amber-600 font-medium whitespace-nowrap animate-in fade-in slide-in-from-top-1 bg-background/80 backdrop-blur px-2 py-1 rounded border border-amber-200 shadow-sm z-50">
+                                                {feedbackMessage}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>

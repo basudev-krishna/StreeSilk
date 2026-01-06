@@ -8,6 +8,9 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { cn } from "../lib/utils";
 import { formatPrice } from "../lib/formatters";
+import { useRouter } from "next/navigation";
+import { clearCart as clearCartAction } from "../actions/cart";
+import { submitOrder } from "../actions/order";
 
 export default function CartPage() {
     const {
@@ -20,6 +23,7 @@ export default function CartPage() {
     } = useCart();
     const { isSignedIn, requireAuth } = useAuth();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const router = useRouter();
 
     const isEmpty = cartItems.length === 0;
 
@@ -39,10 +43,18 @@ export default function CartPage() {
 
         setIsCheckingOut(true);
 
-        setTimeout(() => {
-            alert("Checkout functionality would go here in a real app!");
+        try {
+            const total = getCartTotal();
+            const orderId = await submitOrder(cartItems, total);
+
+            await clearCart(); // Clear the context/local cart
+
+            router.push(`/order-success?orderId=${orderId}`);
+        } catch (error) {
+            console.error("Checkout failed:", error);
+            alert("Checkout failed. Please try again.");
             setIsCheckingOut(false);
-        }, 1500);
+        }
     };
 
     if (isLoading) {
