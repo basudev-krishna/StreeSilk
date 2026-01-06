@@ -33,6 +33,9 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "StreeSilk | Authentic Assamese Silk",
   description: "Discover the elegance of genuine Muga, Pat, and Eri silk. Handcrafted tradition meets modern sophistication.",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export const viewport: Viewport = {

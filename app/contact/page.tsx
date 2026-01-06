@@ -11,7 +11,7 @@ import { useAuth as useClerkAuth } from "@clerk/nextjs";
 import { submitContactMessage } from "../actions/contact";
 
 // --- Constants ---
-const GUWAHATI_ADDRESS = "Ganeshguri, Guwahati, Assam, India - 781006"; // Specific Demo Address
+const GUWAHATI_ADDRESS = "Ambari, Guwahati, Assam, India - 781025"; // Specific Demo Address
 const CONTACT_INFO = {
     email1: "streesilk41@gmail.com",
     email2: "streesilk41@gmail.com",
@@ -237,7 +237,7 @@ export default function ContactPage() {
             {/* Hero section */}
             <div className="relative h-60 sm:h-72 md:h-80 bg-muted overflow-hidden">
                 <Image
-                    src="https://images.unsplash.com/photo-1534536281715-e28d76689b4d?q=80&w=2070&auto=format&fit=crop"
+                    src="/banner.jpeg"
                     alt="Contact us"
                     fill
                     priority
